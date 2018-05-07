@@ -1,6 +1,7 @@
 package load
 
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import org.pcollections.HashTreePMap
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.web.reactive.function.BodyInserters
@@ -10,13 +11,14 @@ import reactor.core.publisher.Flux
 import java.time.Duration
 
 object EurekaRegistrations {
-    //    const val EUREKA_HOST = "http://localhost:8761"
-    const val EUREKA_HOST = "https://citi-82591.cfapps.io"
-    const val CLIENT_IP = "10.20.100.1"
-
     val logger = LoggerFactory.getLogger(EurekaLoad::class.java)
 
     val meterRegistry = SimpleMeterRegistry()
+
+    val NUM_CLIENTS = 200
+
+    @Volatile
+    var clients = HashTreePMap.empty<Int, Long>()
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -28,7 +30,7 @@ object EurekaRegistrations {
                 .defaultHeader(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .build()
 
-        (0..500).forEach { index ->
+        (1..NUM_CLIENTS).forEach { index ->
             val timestamp = System.currentTimeMillis()
 
             val body = """
@@ -93,15 +95,15 @@ object EurekaRegistrations {
                     }
         }
 
-        Flux.interval(Duration.ofSeconds(10))
+        Flux.interval(Duration.ofSeconds(1), Duration.ofSeconds(10))
                 .doOnEach({ n ->
-                    (0..500).forEach { index ->
+                    (1..NUM_CLIENTS).forEach { index ->
                         client.put()
                                 .uri { builder ->
                                     builder.path("/eureka/apps/{clientName}/{clientIp}")
                                             .queryParam("status", "UP")
-                                            .queryParam("lastDirtyTimestamp", EurekaLoad.clients[index])
-                                            .build("CLIENT-$index", EurekaLoad.CLIENT_IP)
+                                            .queryParam("lastDirtyTimestamp", clients[index] ?: System.currentTimeMillis())
+                                            .build("CLIENT-$index", CLIENT_IP)
                                 }
                                 .exchange().subscribe {
                                     val status = it.statusCode().value()
@@ -109,10 +111,10 @@ object EurekaRegistrations {
                                             "uri", "/eureka/apps/{clientName}/{clientIp}",
                                             "status", status.toString()).increment()
                                     if (status < 300) {
-                                        EurekaLoad.logger.debug("UT /eureka/apps/CLIENT-$index/${EurekaLoad.CLIENT_IP} $status")
+                                        EurekaLoad.logger.debug("UT /eureka/apps/CLIENT-$index/$CLIENT_IP $status")
                                     } else {
                                         it.bodyToMono<String>().subscribe { body ->
-                                            EurekaLoad.logger.warn("UT /eureka/apps/CLIENT-$index/${EurekaLoad.CLIENT_IP} $status: $body")
+                                            EurekaLoad.logger.warn("UT /eureka/apps/CLIENT-$index/$CLIENT_IP $status: $body")
                                         }
                                     }
 

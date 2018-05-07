@@ -16,10 +16,6 @@ import java.time.Duration
  */
 
 object EurekaLoad {
-//    const val EUREKA_HOST = "http://localhost:8761"
-    const val EUREKA_HOST = "https://citi-82591.cfapps.io"
-    const val CLIENT_IP = "10.20.100.1"
-
     @Volatile
     var clients = HashTreePMap.empty<Int, Long>()
 
@@ -105,6 +101,8 @@ object EurekaLoad {
                           }
                         }
                         """.trimMargin()
+
+                    clients = clients.plus(index, timestamp)
 
                     client.post()
                             .uri("/eureka/apps/{clientName}", "CLIENT-$index")

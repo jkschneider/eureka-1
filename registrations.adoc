@@ -1,0 +1,15 @@
+== Study on "renews (last minute)" in Eureka dashboard
+
+[options="header"]
+|=========================================================
+|clients | number of renewals | explain | renew threshold
+|1 | 6  | puts/minute | 3
+|2 | 24 | puts/minute * 2 | 5
+|3 | 36 | puts/minute * 2 | ?
+|4 | 40 || 8
+|10 | 80 || 18
+|100 | 1200 | puts/minute * 2 | 171
+|500 | 17482 || 851   (with a handful of connection resets)
+|=========================================================
+
+puts/minute = clients * 6
