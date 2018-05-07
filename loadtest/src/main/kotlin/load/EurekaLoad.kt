@@ -16,7 +16,8 @@ import java.time.Duration
  */
 
 object EurekaLoad {
-    const val EUREKA_HOST = "http://localhost:8761"
+//    const val EUREKA_HOST = "http://localhost:8761"
+    const val EUREKA_HOST = "https://citi-82591.cfapps.io"
     const val CLIENT_IP = "10.20.100.1"
 
     @Volatile
@@ -38,24 +39,25 @@ object EurekaLoad {
             val index: Int = n.get()!!.toInt()
             logger.info("Sending $index requests")
 
-            (0..index).forEach {
-                client.get()
-                        .uri("/eureka/apps")
-                        .exchange()
-                        .subscribe {
-                            val status = it.statusCode().value()
-                            logger.debug("GET /eureka/apps $status")
-                            meterRegistry.counter("eureka.requests", "uri", "/eureka/apps",
-                                    "status", status.toString()).increment()
-
-                            it.bodyToFlux<String>().subscribe { applications ->
-                                meterRegistry.summary("applications.size").record((applications.length * 2).toDouble())
-                            }
-                        }
-
+            (0..1).forEach {
                 if (!clients.contains(index)) {
                     val timestamp = System.currentTimeMillis()
                     clients = clients.plus(index, timestamp)
+
+                    client.get()
+                            .uri("/eureka/apps")
+                            .exchange()
+                            .subscribe {
+                                val status = it.statusCode().value()
+                                logger.debug("GET /eureka/apps $status")
+                                meterRegistry.counter("eureka.requests", "uri", "/eureka/apps",
+                                        "status", status.toString()).increment()
+
+                                it.bodyToFlux<String>().subscribe { applications ->
+                                    meterRegistry.summary("applications.size", "uri", "/eureka/apps")
+                                            .record((applications.length * 2).toDouble())
+                                }
+                            }
 
                     val body = """
                         {
@@ -118,6 +120,21 @@ object EurekaLoad {
                                 }
                             }
                 } else {
+                    client.get()
+                            .uri("/eureka/apps/delta")
+                            .exchange()
+                            .subscribe {
+                                val status = it.statusCode().value()
+                                logger.debug("GET /eureka/apps/delta $status")
+                                meterRegistry.counter("eureka.requests", "uri", "/eureka/apps/delta",
+                                        "status", status.toString()).increment()
+
+                                it.bodyToFlux<String>().subscribe { applications ->
+                                    meterRegistry.summary("applications.size", "uri", "/eureka/apps/delta")
+                                            .record((applications.length * 2).toDouble())
+                                }
+                            }
+
                     client.put()
                             .uri { builder ->
                                 builder.path("/eureka/apps/{clientName}/{clientIp}")
