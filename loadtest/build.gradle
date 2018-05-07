@@ -10,6 +10,5 @@ dependencies {
     compile 'io.projectreactor:reactor-core:3.1.7.RELEASE'
     compile 'org.springframework.boot:spring-boot-starter-webflux:2.0.1.RELEASE'
     compile 'org.jetbrains.kotlin:kotlin-reflect'
-    compile 'org.pcollections:pcollections:latest.release'
     compile 'io.micrometer:micrometer-registry-prometheus:1.0.3'
 }
