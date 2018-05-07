@@ -69,8 +69,8 @@
       "datasource": "${DS_PROM}",
       "fill": 1,
       "gridPos": {
-        "h": 9,
-        "w": 12,
+        "h": 7,
+        "w": 10,
         "x": 0,
         "y": 1
       },
@@ -149,9 +149,9 @@
       "datasource": "${DS_PROM}",
       "fill": 1,
       "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
+        "h": 7,
+        "w": 9,
+        "x": 10,
         "y": 1
       },
       "id": 10,
@@ -228,10 +228,10 @@
       "datasource": "${DS_PROM}",
       "fill": 0,
       "gridPos": {
-        "h": 9,
-        "w": 12,
+        "h": 7,
+        "w": 10,
         "x": 0,
-        "y": 10
+        "y": 8
       },
       "id": 16,
       "legend": {
@@ -314,10 +314,10 @@
       "datasource": "${DS_PROM}",
       "fill": 0,
       "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 10
+        "h": 7,
+        "w": 9,
+        "x": 10,
+        "y": 8
       },
       "id": 18,
       "legend": {
@@ -387,19 +387,6 @@
       ]
     },
     {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 19
-      },
-      "id": 6,
-      "panels": [],
-      "title": "Load Tester",
-      "type": "row"
-    },
-    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -407,12 +394,12 @@
       "datasource": "${DS_PROM}",
       "fill": 0,
       "gridPos": {
-        "h": 9,
-        "w": 12,
+        "h": 7,
+        "w": 10,
         "x": 0,
-        "y": 20
+        "y": 15
       },
-      "id": 2,
+      "id": 20,
       "legend": {
         "avg": false,
         "current": false,
@@ -436,17 +423,17 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(applications_size_sum[1m])/rate(applications_size_count[1m])",
+          "expr": "http_server_requests_seconds_max",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{uri}}",
+          "legendFormat": "{{method}} {{uri}}",
           "refId": "A"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Eureka /eureka/apps Response Size",
+      "title": "Max Latency (server's perspective)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -462,11 +449,11 @@
       },
       "yaxes": [
         {
-          "format": "bytes",
+          "format": "s",
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": "0",
+          "min": null,
           "show": true
         },
         {
@@ -487,12 +474,12 @@
       "datasource": "${DS_PROM}",
       "fill": 0,
       "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 12,
-        "y": 20
+        "h": 7,
+        "w": 9,
+        "x": 10,
+        "y": 15
       },
-      "id": 12,
+      "id": 22,
       "legend": {
         "avg": false,
         "current": false,
@@ -512,21 +499,21 @@
       "renderer": "flot",
       "seriesOverrides": [],
       "spaceLength": 10,
-      "stack": true,
+      "stack": false,
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(eureka_requests_total[1m])",
+          "expr": "rate(http_server_requests_seconds_sum[1m])/rate(http_server_requests_seconds_count[1m])",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{uri}} {{status}}",
+          "legendFormat": "{{method}} {{uri}}",
           "refId": "A"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Eureka Requests By Path and Status",
+      "title": "Average Latency (server's perspective)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -542,11 +529,11 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "format": "s",
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": "0",
+          "min": null,
           "show": true
         },
         {
@@ -560,84 +547,178 @@
       ]
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "${DS_PROM}",
-      "fill": 0,
+      "collapsed": true,
       "gridPos": {
-        "h": 9,
-        "w": 12,
+        "h": 1,
+        "w": 24,
         "x": 0,
-        "y": 29
+        "y": 22
       },
-      "id": 14,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 2,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
+      "id": 6,
+      "panels": [
         {
-          "expr": "eureka_requests_total",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "legendFormat": "{{uri}} {{status}}",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Total requests by endpoint",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": null,
+          "fill": 0,
+          "gridPos": {
+            "h": 7,
+            "w": 10,
+            "x": 0,
+            "y": 16
+          },
+          "id": 2,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "rate(applications_size_sum[1m])/rate(applications_size_count[1m])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{uri}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Eureka /eureka/apps Response Size",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "bytes",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
         },
         {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": null,
+          "fill": 0,
+          "gridPos": {
+            "h": 7,
+            "w": 9,
+            "x": 10,
+            "y": 16
+          },
+          "id": 12,
+          "legend": {
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "rate(eureka_requests_total[1m])",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{uri}} {{status}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Eureka Requests By Path and Status",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
         }
-      ]
+      ],
+      "title": "Load Tester",
+      "type": "row"
     }
   ],
   "refresh": "10s",
@@ -679,5 +760,5 @@
   "timezone": "",
   "title": "Eureka Load Test",
   "uid": "33jVDeGik",
-  "version": 5
+  "version": 6
 }
