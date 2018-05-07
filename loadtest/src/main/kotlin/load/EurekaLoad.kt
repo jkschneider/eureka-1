@@ -33,13 +33,15 @@ object EurekaLoad {
                 .builder()
                 .baseUrl(EUREKA_HOST)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .defaultHeader(HttpHeaders.ACCEPT, "application/json")
+                .defaultHeader(HttpHeaders.ACCEPT_ENCODING, "gzip")
                 .build()
 
-        Flux.interval(Duration.ofSeconds(10)).doOnEach { n: Signal<Long> ->
+        Flux.interval(Duration.ofSeconds(30)).doOnEach { n: Signal<Long> ->
             val index: Int = n.get()!!.toInt()
             logger.info("Sending $index requests")
 
-            (0..1).forEach {
+            (0..100).forEach {
                 if (!clients.contains(index)) {
                     val timestamp = System.currentTimeMillis()
                     clients = clients.plus(index, timestamp)
@@ -53,8 +55,8 @@ object EurekaLoad {
                                 meterRegistry.counter("eureka.requests", "uri", "/eureka/apps",
                                         "status", status.toString()).increment()
 
-                                it.bodyToFlux<String>().subscribe { applications ->
-                                    meterRegistry.summary("applications.size", "uri", "/eureka/apps")
+                                it.bodyToMono<String>().subscribe { applications ->
+                                    EurekaGets.meterRegistry.summary("applications.size", "uri", "/eureka/apps")
                                             .record((applications.length * 2).toDouble())
                                 }
                             }
