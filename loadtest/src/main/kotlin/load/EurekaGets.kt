@@ -13,10 +13,7 @@ import java.time.Duration
  */
 
 object EurekaGets {
-    //    const val EUREKA_HOST = "http://localhost:8761"
-    const val EUREKA_HOST = "https://citi-82591.cfapps.io"
-
-    val logger = LoggerFactory.getLogger(EurekaLoad::class.java)
+    val logger = LoggerFactory.getLogger(EurekaGets::class.java)
 
     val meterRegistry = Prometheus.setup()
 

@@ -46,6 +46,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": null,
+  "iteration": 1525714676871,
   "links": [],
   "panels": [
     {
@@ -98,7 +99,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "jvm_memory_used_bytes{job=\"citi-82591\"}",
+          "expr": "jvm_memory_used_bytes{job=\"$eurekaserver\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{id}}",
@@ -178,7 +179,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "system_cpu_usage{job=\"citi-82591\"}",
+          "expr": "system_cpu_usage{job=\"$eurekaserver\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "refId": "A"
@@ -203,7 +204,7 @@
       },
       "yaxes": [
         {
-          "format": "percent",
+          "format": "percentunit",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -257,7 +258,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(jvm_gc_pause_seconds_count[1m])",
+          "expr": "rate(jvm_gc_pause_seconds_count{job=\"$eurekaserver\"}[1m])",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{action}} because {{cause}}",
@@ -343,7 +344,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(jvm_gc_pause_seconds_sum[1m])/rate(jvm_gc_pause_seconds_count[1m])",
+          "expr": "rate(jvm_gc_pause_seconds_sum{job=\"$eurekaserver\"}[1m])/rate(jvm_gc_pause_seconds_count{job=\"$eurekaserver\"}[1m])",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{action}} because {{cause}}",
@@ -395,7 +396,7 @@
       "fill": 0,
       "gridPos": {
         "h": 7,
-        "w": 10,
+        "w": 6,
         "x": 0,
         "y": 15
       },
@@ -423,10 +424,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "http_server_requests_seconds_max",
+          "expr": "eureka_server_requests_seconds_max{job=\"$eurekaserver\"}",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{method}} {{uri}}",
+          "legendFormat": "{{method}} {{uri}} {{status}}",
           "refId": "A"
         }
       ],
@@ -475,8 +476,8 @@
       "fill": 0,
       "gridPos": {
         "h": 7,
-        "w": 9,
-        "x": 10,
+        "w": 7,
+        "x": 6,
         "y": 15
       },
       "id": 22,
@@ -503,10 +504,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(http_server_requests_seconds_sum[1m])/rate(http_server_requests_seconds_count[1m])",
+          "expr": "rate(eureka_server_requests_seconds_sum{job=\"$eurekaserver\"}[1m])/rate(eureka_server_requests_seconds_count{job=\"$eurekaserver\"}[1m])",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{method}} {{uri}}",
+          "legendFormat": "{{method}} {{uri}} {{status}}",
           "refId": "A"
         }
       ],
@@ -547,6 +548,86 @@
       ]
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_PROM}",
+      "fill": 0,
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 13,
+        "y": 15
+      },
+      "id": 24,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "rate(eureka_server_requests_seconds_count[1m])",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "{{method}} {{uri}} {{status}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Eureka Endpoint Throughput",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
+    },
+    {
       "collapsed": true,
       "gridPos": {
         "h": 1,
@@ -567,7 +648,7 @@
             "h": 7,
             "w": 10,
             "x": 0,
-            "y": 16
+            "y": 23
           },
           "id": 2,
           "legend": {
@@ -647,7 +728,7 @@
             "h": 7,
             "w": 9,
             "x": 10,
-            "y": 16
+            "y": 23
           },
           "id": 12,
           "legend": {
@@ -726,7 +807,35 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "tags": [],
+          "text": "local-eureka",
+          "value": "local-eureka"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "The job id of the eureka server to chart",
+        "multi": false,
+        "name": "eurekaserver",
+        "options": [
+          {
+            "selected": false,
+            "text": "citi-82591",
+            "value": "citi-82591"
+          },
+          {
+            "selected": true,
+            "text": "local-eureka",
+            "value": "local-eureka"
+          }
+        ],
+        "query": "citi-82591,local-eureka",
+        "type": "custom"
+      }
+    ]
   },
   "time": {
     "from": "now-5m",
@@ -760,5 +869,5 @@
   "timezone": "",
   "title": "Eureka Load Test",
   "uid": "33jVDeGik",
-  "version": 6
+  "version": 9
 }

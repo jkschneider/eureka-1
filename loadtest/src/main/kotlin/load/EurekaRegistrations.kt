@@ -1,6 +1,5 @@
 package load
 
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.pcollections.HashTreePMap
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
@@ -9,13 +8,14 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Flux
 import java.time.Duration
+import java.util.concurrent.CountDownLatch
 
 object EurekaRegistrations {
-    val logger = LoggerFactory.getLogger(EurekaLoad::class.java)
+    val logger = LoggerFactory.getLogger(EurekaRegistrations::class.java)
 
-    val meterRegistry = SimpleMeterRegistry()
+    val meterRegistry = Prometheus.setup()
 
-    val NUM_CLIENTS = 200
+    val NUM_CLIENTS = 1
 
     @Volatile
     var clients = HashTreePMap.empty<Int, Long>()
@@ -88,9 +88,16 @@ object EurekaRegistrations {
                         if (status < 300) {
                             logger.debug("POST /eureka/apps/CLIENT-$index $status")
                         } else {
-                            it.bodyToMono<String>().subscribe { body ->
-                                logger.warn("POST /eureka/apps/CLIENT-$index $status: $body")
-                            }
+                            val countDown = CountDownLatch(1)
+                            it.bodyToMono<String>()
+                                    .doOnTerminate {
+                                        if (countDown.count > 0)
+                                            logger.warn("POST /eureka/apps/CLIENT-$index $status")
+                                    }
+                                    .subscribe { body ->
+                                        logger.warn("POST /eureka/apps/CLIENT-$index $status: $body")
+                                        countDown.countDown()
+                                    }
                         }
                     }
         }
@@ -102,20 +109,31 @@ object EurekaRegistrations {
                                 .uri { builder ->
                                     builder.path("/eureka/apps/{clientName}/{clientIp}")
                                             .queryParam("status", "UP")
-                                            .queryParam("lastDirtyTimestamp", clients[index] ?: System.currentTimeMillis())
+                                            .queryParam("lastDirtyTimestamp", clients[index]
+                                                    ?: System.currentTimeMillis())
                                             .build("CLIENT-$index", CLIENT_IP)
                                 }
+                                .header("DiscoveryIdentity-Name", "DefaultClient")
+                                .header("DiscoveryIdentity-Version", "1.4")
+                                .header("DiscovertIdentity-Id", "10.200.10.1")
                                 .exchange().subscribe {
                                     val status = it.statusCode().value()
-                                    EurekaLoad.meterRegistry.counter("eureka.requests",
+                                    meterRegistry.counter("eureka.requests",
                                             "uri", "/eureka/apps/{clientName}/{clientIp}",
                                             "status", status.toString()).increment()
                                     if (status < 300) {
-                                        EurekaLoad.logger.debug("UT /eureka/apps/CLIENT-$index/$CLIENT_IP $status")
+                                        logger.debug("PUT /eureka/apps/CLIENT-$index/$CLIENT_IP $status")
                                     } else {
-                                        it.bodyToMono<String>().subscribe { body ->
-                                            EurekaLoad.logger.warn("UT /eureka/apps/CLIENT-$index/$CLIENT_IP $status: $body")
-                                        }
+                                        val countDown = CountDownLatch(1)
+                                        it.bodyToMono<String>()
+                                                .doOnTerminate {
+                                                    if (countDown.count > 0)
+                                                        logger.warn("PUT /eureka/apps/CLIENT-$index/$CLIENT_IP $status")
+                                                }
+                                                .subscribe { body ->
+                                                    logger.warn("PUT /eureka/apps/CLIENT-$index/$CLIENT_IP $status: $body")
+                                                    countDown.countDown()
+                                                }
                                     }
 
                                 }

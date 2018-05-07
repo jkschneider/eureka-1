@@ -37,3 +37,32 @@ scrape_configs:
       - targets: ['citi-82591.cfapps.io']
 
 ```
+
+## A heartbeat PUT
+
+```
+PUT /eureka/apps/UNKNOWN/10.200.10.1?status=UP&lastDirtyTimestamp=1525720652715 HTTP/1.1
+DiscoveryIdentity-Name: DefaultClient
+DiscoveryIdentity-Version: 1.4
+DiscoveryIdentity-Id: 10.200.10.1
+Accept-Encoding: gzip
+Content-Length: 0
+Host: localhost:8761
+Connection: Keep-Alive
+User-Agent: Java-EurekaClient/v1.8.8
+
+HTTP/1.1 200 
+Content-Type: application/xml
+Content-Length: 0
+Date: Mon, 07 May 2018 19:18:02 GMT
+```
+
+
+
+PUT /eureka/apps/CLIENT-1/10.20.100.1?status=UP&lastDirtyTimestamp=1525720792508 HTTP/1.1
+user-agent: ReactorNetty/0.7.6.RELEASE
+transfer-encoding: chunked
+host: localhost:8761
+Content-Type: application/json
+Accept: application/json
+Accept-Encoding: gzip
