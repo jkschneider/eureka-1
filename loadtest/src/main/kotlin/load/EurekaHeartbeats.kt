@@ -11,15 +11,16 @@ import java.util.concurrent.CountDownLatch
 
 /**
  * Load test simulating heart beats from a configurable number of clients.
+ *
+ * @author Jon Schneider
  */
-object EurekaRegistrations {
-    private val HEARTBEAT_INTERVAL_SECONDS = Duration.ofSeconds(10)
-
-    private val logger = LoggerFactory.getLogger(EurekaRegistrations::class.java)
-    private val meterRegistry = Prometheus.setup()
+object EurekaHeartbeats {
+    private val logger = LoggerFactory.getLogger(EurekaHeartbeats::class.java)
 
     @JvmStatic
     fun main(args: Array<String>) {
+        logger.info("Simulating $NUM_CLIENTS every ${HEARTBEAT_INTERVAL_SECONDS.seconds} seconds")
+
         val client = WebClient
                 .builder()
                 .baseUrl(EUREKA_HOST)
@@ -81,8 +82,6 @@ object EurekaRegistrations {
                     .body(BodyInserters.fromObject(body))
                     .exchange().subscribe {
                         val status = it.statusCode().value()
-                        meterRegistry.counter("eureka.requests", "uri", "/eureka/apps/{clientName}",
-                                "status", status.toString()).increment()
                         if (status < 300) {
                             logger.debug("POST /eureka/apps/CLIENT$index $status")
                         } else {
@@ -114,9 +113,6 @@ object EurekaRegistrations {
                                 .header("DiscovertIdentity-Id", "10.200.10.1")
                                 .exchange().subscribe {
                                     val status = it.statusCode().value()
-                                    meterRegistry.counter("eureka.requests",
-                                            "uri", "/eureka/apps/{clientName}/{clientIp}",
-                                            "status", status.toString()).increment()
                                     if (status < 300) {
                                         logger.debug("PUT /eureka/apps/CLIENT$index/$CLIENT_IP $status")
                                     } else {

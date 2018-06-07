@@ -12,3 +12,13 @@ dependencies {
     compile 'org.jetbrains.kotlin:kotlin-reflect'
     compile 'io.micrometer:micrometer-registry-prometheus:1.0.3'
 }
+
+task loadTestReplications(type: JavaExec, dependsOn: 'compileKotlin') {
+    main = 'load.EurekaBatchReplications'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task loadTestHeartbeats(type: JavaExec, dependsOn: 'compileKotlin') {
+    main= 'load.EurekaRegistrations'
+    classpath = sourceSets.main.runtimeClasspath
+}
