@@ -9,8 +9,11 @@ import reactor.core.publisher.Flux
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
 
+/**
+ * Load test simulating heart beats from a configurable number of clients.
+ */
 object EurekaRegistrations {
-    private const val NUM_CLIENTS = 1
+    private val HEARTBEAT_INTERVAL_SECONDS = Duration.ofSeconds(10)
 
     private val logger = LoggerFactory.getLogger(EurekaRegistrations::class.java)
     private val meterRegistry = Prometheus.setup()
@@ -97,7 +100,7 @@ object EurekaRegistrations {
                     }
         }
 
-        Flux.interval(Duration.ofSeconds(1), Duration.ofSeconds(10))
+        Flux.interval(Duration.ofSeconds(3), HEARTBEAT_INTERVAL_SECONDS)
                 .doOnEach({
                     (1..NUM_CLIENTS).forEach { index ->
                         client.put()
@@ -115,7 +118,7 @@ object EurekaRegistrations {
                                             "uri", "/eureka/apps/{clientName}/{clientIp}",
                                             "status", status.toString()).increment()
                                     if (status < 300) {
-                                        logger.info("PUT /eureka/apps/CLIENT$index/$CLIENT_IP $status")
+                                        logger.debug("PUT /eureka/apps/CLIENT$index/$CLIENT_IP $status")
                                     } else {
                                         val countDown = CountDownLatch(1)
                                         it.bodyToMono<String>()

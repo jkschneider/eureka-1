@@ -35,6 +35,9 @@ class MetricsFilterConfiguration {
             public void init(FilterConfig filterConfig) {
             }
 
+            /**
+             * This captures requests that are ultimately going to be handled by eureka internals.
+             */
             @Override
             public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
                 Timer.Sample sample = Timer.start(registry);

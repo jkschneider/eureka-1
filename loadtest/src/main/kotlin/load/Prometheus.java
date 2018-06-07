@@ -8,6 +8,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.time.Duration;
 
@@ -37,6 +38,8 @@ public class Prometheus {
             });
 
             new Thread(server::start).run();
+        } catch (BindException ignored) {
+            // already running, do nothing.
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

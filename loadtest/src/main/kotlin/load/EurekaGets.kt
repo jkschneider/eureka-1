@@ -9,13 +9,15 @@ import reactor.core.publisher.Flux
 import java.time.Duration
 
 /**
+ * Simulates GET requests against /eureka/apps. It turns out this isn't that common, so isn't that useful for
+ * load tests.
+ *
  * @author Jon Schneider
  */
-
+@Deprecated("Not needed for load test")
 object EurekaGets {
-    val logger = LoggerFactory.getLogger(EurekaGets::class.java)
-
-    val meterRegistry = Prometheus.setup()
+    private val logger = LoggerFactory.getLogger(EurekaGets::class.java)
+    private val meterRegistry = Prometheus.setup()
 
     @JvmStatic
     fun main(args: Array<String>) {
